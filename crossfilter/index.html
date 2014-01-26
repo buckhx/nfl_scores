@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>NFL Scores</title>
+
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" />
+
+<div id="body">
+
+<a href="https://github.com/square"><img src="{{ url_for('static', filename='img/logotype.png') }}" width="122" height="31"></a>
+
+<h1>NFL Scores</h1>
+
+<h2>Analyze the scores and yardages from every NFL game</h2>
+
+<p>Here's an analysis tool for NFL games using Square's Crossfilter library and D3</p>
+
+<div id="charts">
+  <div id="week-chart" class="chart">
+    <div class="title">Week</div>
+  </div>
+  <div id="points-chart" class="chart">
+    <div class="title">Points</div>
+  </div>
+  <div id="yards-chart" class="chart">
+    <div class="title">Yards</div>
+  </div>
+  <div id="year-chart" class="chart">
+    <div class="title">Year</div>
+  </div>
+</div>
+
+<aside id="totals"><span id="active">-</span> of <span id="total">-</span> games selected.</aside>
+
+<div id="lists">
+  <div id="game-list" class="list"></div>
+</div>
+
+<footer>
+  <span style="float:right;">
+    Released under the <a href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License 2.0</a>.
+  </span>
+  Copyright 2012 <a href="http://squareup.com">Square, Inc.</a>
+</footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/crossfilter.v1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/d3.v3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nfl_scores.js') }}"></script>
