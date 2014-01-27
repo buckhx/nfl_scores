@@ -17,21 +17,20 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 		d.yds_t = d.yds_w + d.yds_l;
 		switch (d.week) {
 			case "WildCard":
-				d.week = 100;
+				d.week = 20;
 				break;
 			case "Division":
-				d.week = 101;
+				d.week = 21;
 				break;
 			case "ConfChamp":
-				d.week = 102;
+				d.week = 22;
 				break;
 			case "SuperBowl":
-				d.week = 103;
+				d.week = 23;
 				break;
 			default:
 				d.week = +d.week;	
 		};
-		
 	});
 
 	//create crossfilter
@@ -39,14 +38,14 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 			all = game.groupAll(),
 
 			year = game.dimension(function(d) { return d.year; }),
-			years = year.group(),
+			years = year.group(function (d) {return Math.floor(d/5)*5; }),
 
 			week = game.dimension(function(d) { return d.week; }),
 			weeks = week.group(),
 			//weekDomain = weeks.all().map(function(d) { return d.key; }),
 
 			yard = game.dimension(function(d) {return d.yds_t; }),
-			yards = yard.group(function(d) { return Math.floor(d/50)*50; }),
+			yards = yard.group(function(d) { return Math.floor(d/25)*25; }),
 
 			point = game.dimension(function(d) { return d.pts_t }),
 			points = point.group(function(d) { return Math.floor(d/5)*5 });
@@ -58,10 +57,11 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 				.dimension(week)
 				.group(weeks)
 			//.x(d3.scale.ordinal()
+			//	.domain(weekDomain)
+			//	.rangeBands([0, 21*10])),
 			.x(d3.scale.linear()
-				//.domain(weekDomain)),
-				.domain([1, 21])
-				.rangeRound([0, 20 * 10])),
+				.domain([1, 24])
+				.rangeRound([0, 23 * 10])),
 
 		//point chart
 		barChart()
@@ -77,15 +77,16 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 				.group(yards)
 			.x(d3.scale.linear()
 				.domain([0, 1200])
-				.rangeRound([0, 30 * 10])),
+				.rangeRound([0, 48 * 10])),
 
 		//year chart
 		barChart()
 				.dimension(year)
 				.group(years)
 			.x(d3.scale.linear()
-				.domain([1940, 2013])
-				.rangeRound([40 * 10]))
+				.domain([1940, 2014])
+				.rangeRound([0, 25 * 10]))
+			
 	];
 
 	// Assume that charts[] is ordered the same as in DOM
@@ -112,6 +113,18 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 		chart.each(render);
 		// list.each(render);
 		d3.select("#active").text(formatNumber(all.value()));
+		var yardAvg = yards.all()
+				.map(function(d){return d.key*d.value;})
+				.reduce(function(a,b){return a+b;})
+			/ all.value();
+		yardAvg = ((isNaN(yardAvg) || !isFinite(yardAvg)) ? '-' : d3.round(yardAvg));
+    d3.select("#yard-avg").text(yardAvg);
+		var ptAvg = points.all()
+				.map(function(d){return d.key*d.value;})
+				.reduce(function(a,b){return a+b;})
+			/ all.value();
+		ptAvg = ((isNaN(ptAvg) || !isFinite(ptAvg)) ? '-' : d3.round(ptAvg));
+    d3.select("#point-avg").text(ptAvg);
 	}
 
 	window.filter = function(filters) {
@@ -126,7 +139,22 @@ d3.csv("/crossfilter/data/nfl_scores.csv", function(error, games){
 
 	//TODO
 	//game list
+/*
+	function gameList(div) {
+		div.each(function() {
+			var year = d3.select(this).selectAll(".date")
+				.data(year.top(40), function(d) { return d.key; });
 
+			year.enter().append("div")
+					.attr("class", "date")
+				.append("div")
+					.attr("class", "day")
+					.text(function(d) { return d.values[0].year; });
+
+			year.exit().remove();
+		}
+	}
+*/
 	//bar chart methods. Copy and pasted from example
 	  function barChart() {
 	    if (!barChart.id) barChart.id = 0;
